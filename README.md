@@ -1,6 +1,15 @@
 # fcards
 コマンドライン単語帳
 
+##### インストール
+
+```go
+go install https://github.com/twinbird/fcards
+```
+
+もしくはReleaseからダウンロードして, 環境変数にPATHを設定してください.
+
+
 ###### 使い方
 
 単語帳のTSVファイルを用意します.
