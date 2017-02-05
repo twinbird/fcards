@@ -4,7 +4,7 @@
 ##### インストール
 
 ```go
-go install https://github.com/twinbird/fcards
+go install github.com/twinbird/fcards
 ```
 
 もしくはReleaseからダウンロードして, 環境変数にPATHを設定してください.
