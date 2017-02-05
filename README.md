@@ -4,6 +4,7 @@
 ##### インストール
 
 ```go
+go get github.com/twinbird/fcards
 go install github.com/twinbird/fcards
 ```
 
