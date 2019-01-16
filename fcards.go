@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"bufio"
 )
 
 const (
@@ -84,8 +85,9 @@ func main() {
 }
 
 func jpToEnLoop(idx int, double bool) int {
-	var answer string
 	var last int
+	scanner := bufio.NewScanner(os.Stdin)
+
 	for i, v := range cards {
 		if i < idx {
 			continue
@@ -95,7 +97,8 @@ func jpToEnLoop(idx int, double bool) int {
 		if double == false {
 			fmt.Printf("%s\n", v.jp)
 			fmt.Printf("> ")
-			fmt.Scanln(&answer)
+			scanner.Scan()
+			answer := scanner.Text()
 			if answer == ":q" {
 				break
 			}
@@ -104,7 +107,8 @@ func jpToEnLoop(idx int, double bool) int {
 			fmt.Printf("%s\n", v.jp)
 			fmt.Printf("%s\n", v.en)
 			fmt.Printf("> ")
-			fmt.Scanln(&answer)
+			scanner.Scan()
+			answer := scanner.Text()
 			if answer == ":q" {
 				break
 			}
@@ -114,8 +118,9 @@ func jpToEnLoop(idx int, double bool) int {
 }
 
 func enToJpLoop(idx int, double bool) int {
-	var answer string
 	var last int
+	scanner := bufio.NewScanner(os.Stdin)
+
 	for i, v := range cards {
 		if i < idx {
 			continue
@@ -125,7 +130,8 @@ func enToJpLoop(idx int, double bool) int {
 			fmt.Printf("\n%d / %d\n", i+1, len(cards))
 			fmt.Printf("%s\n", v.en)
 			fmt.Printf("> ")
-			fmt.Scanln(&answer)
+			scanner.Scan()
+			answer := scanner.Text()
 			if answer == ":q" {
 				break
 			}
@@ -135,7 +141,8 @@ func enToJpLoop(idx int, double bool) int {
 			fmt.Printf("%s\n", v.en)
 			fmt.Printf("%s\n", v.jp)
 			fmt.Printf("> ")
-			fmt.Scanln(&answer)
+			scanner.Scan()
+			answer := scanner.Text()
 			if answer == ":q" {
 				break
 			}
