@@ -35,6 +35,7 @@ func main() {
 		reverse  bool
 		filename string
 		reset bool
+		double bool
 	)
 
 	flag.Usage = func() {
@@ -44,6 +45,7 @@ func main() {
 	flag.StringVar(&filename, "f", "./fcards.tsv", "単語帳のファイル名を指定する")
 	flag.BoolVar(&reverse, "r", false, "表面と裏面を反転して始める")
 	flag.BoolVar(&reset, "reset", false, "単語帳を最初から始める")
+	flag.BoolVar(&double, "d", false, "単語帳を両面表示して進める(写経モード)")
 	flag.Parse()
 
 	// 設定ファイルをロード
@@ -70,9 +72,9 @@ func main() {
 
 	// メインループ
 	if reverse == true {
-		config.LastRefRowIdx = jpToEnLoop(config.LastRefRowIdx)
+		config.LastRefRowIdx = jpToEnLoop(config.LastRefRowIdx, double)
 	} else {
-		config.LastRefRowIdx = enToJpLoop(config.LastRefRowIdx)
+		config.LastRefRowIdx = enToJpLoop(config.LastRefRowIdx, double)
 	}
 
 	// 設定ファイルの保存
@@ -81,7 +83,7 @@ func main() {
 	}
 }
 
-func jpToEnLoop(idx int) int {
+func jpToEnLoop(idx int, double bool) int {
 	var answer string
 	var last int
 	for i, v := range cards {
@@ -90,18 +92,28 @@ func jpToEnLoop(idx int) int {
 		}
 		last = i
 		fmt.Printf("\n%d / %d\n", i+1, len(cards))
-		fmt.Printf("%s\n", v.jp)
-		fmt.Printf("> ")
-		fmt.Scanln(&answer)
-		if answer == ":q" {
-			break
+		if double == false {
+			fmt.Printf("%s\n", v.jp)
+			fmt.Printf("> ")
+			fmt.Scanln(&answer)
+			if answer == ":q" {
+				break
+			}
+			fmt.Printf("%s\n", v.en)
+		} else {
+			fmt.Printf("%s\n", v.jp)
+			fmt.Printf("%s\n", v.en)
+			fmt.Printf("> ")
+			fmt.Scanln(&answer)
+			if answer == ":q" {
+				break
+			}
 		}
-		fmt.Printf("%s\n", v.en)
 	}
 	return last
 }
 
-func enToJpLoop(idx int) int {
+func enToJpLoop(idx int, double bool) int {
 	var answer string
 	var last int
 	for i, v := range cards {
@@ -109,14 +121,25 @@ func enToJpLoop(idx int) int {
 			continue
 		}
 		last = i
-		fmt.Printf("\n%d / %d\n", i+1, len(cards))
-		fmt.Printf("%s\n", v.en)
-		fmt.Printf("> ")
-		fmt.Scanln(&answer)
-		if answer == ":q" {
-			break
+		if double == false {
+			fmt.Printf("\n%d / %d\n", i+1, len(cards))
+			fmt.Printf("%s\n", v.en)
+			fmt.Printf("> ")
+			fmt.Scanln(&answer)
+			if answer == ":q" {
+				break
+			}
+			fmt.Printf("%s\n", v.jp)
+		} else {
+			fmt.Printf("\n%d / %d\n", i+1, len(cards))
+			fmt.Printf("%s\n", v.en)
+			fmt.Printf("%s\n", v.jp)
+			fmt.Printf("> ")
+			fmt.Scanln(&answer)
+			if answer == ":q" {
+				break
+			}
 		}
-		fmt.Printf("%s\n", v.jp)
 	}
 	return last
 }
@@ -163,11 +186,31 @@ func (c *Config) load() error {
 	if err != nil {
 		return err
 	}
+	// ファイルがなければ作成する
+	if fileExists(p) == false {
+		if err := c.createInitialConfig(p); err != nil {
+			return err
+		}
+	}
+
 	data, err := ioutil.ReadFile(p)
 	if err != nil {
 		return err
 	}
 	err = json.Unmarshal(data, c)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Config) createInitialConfig(path string) error {
+	c.LastRefRowIdx = 0
+	data, err := json.Marshal(c)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(path, data, os.ModePerm)
 	if err != nil {
 		return err
 	}
